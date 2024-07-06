@@ -22,12 +22,17 @@ post_response = {
         "content": {
             "application/json": {
                 "example": {
-                    "userId": "c3a77c95-0ae3-4837-90cd-e43284729c7a",
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "email": "john.doe@example.com",
-                    "password": "securepassword",
-                    "phone": "000 000 000",
+                    "status": "success",
+                    "message": "Login successful",
+                    "data": {
+                        "accessToken": "eyJh...",
+                        "userId": "c3a77c95-0ae3-4837-90cd-e43284729c7a",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "john.doe@example.com",
+                        "password": "securepassword",
+                        "phone": "000 000 000",
+                    }
                 }
             }
         },
@@ -48,3 +53,37 @@ post_response = {
 
 
 
+post_login_response = {
+    200: {
+        "description": "Successful  login response",
+        "content": {
+            "application/json": {
+                "example": {
+                    "status": "success",
+                    "message": "Login successful",
+                    "data": {
+                        "accessToken": "eyJh...",
+                        "userId": "c3a77c95-0ae3-4837-90cd-e43284729c7a",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "john.doe@example.com",
+                        "password": "securepassword",
+                        "phone": "000 000 000",
+                    }
+                }
+            }
+        },
+    },
+    401: {
+        "description": "Unsuccessful login response",
+        "content": {
+            "application/json": {
+                "example": {
+                    "status": "Bad Request",
+                    "message": "Authentication Failed",
+                    "status_code": 401,
+                }
+            }
+        },
+    },
+}

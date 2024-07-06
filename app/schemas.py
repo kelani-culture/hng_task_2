@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
 # from email_validator import validate_email, EmailNotValidError
-from typing import Mapping, Dict
+from typing import Mapping, Dict, Optional
 from validators import validate_field
 
 
@@ -73,3 +73,8 @@ class UserLoginSchema(BaseModel):
     password: str
     class Config:
         from_attributes = True
+
+class UserDetailSchema(BaseModel):
+    status: str
+    message: str
+    data: UserDataSchema
