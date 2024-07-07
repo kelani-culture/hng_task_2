@@ -22,12 +22,12 @@ class JwtGenerator:
         create user access token
         """
         if  expires_at:
-            expires_at = datetime.now() + expires_at
+            expires = datetime.now() + expires_at
 
         else:
-            expires_at = datetime.now() + timedelta(minutes=4)
+            expires= datetime.now() + timedelta(minutes=4)
 
-        data.update({'exp': expires_at})
+        data.update({'exp': expires})
         return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
 
     @staticmethod
@@ -35,15 +35,12 @@ class JwtGenerator:
         """
         verfy the provided access token given
         """
-        user = None
+        user_id = None
         try:
             user = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             user_id = user.get('userId')
-            if not user_id:
-                message = {"status": "Bad request", "message": "Authentication failed", "StatusCode": 401}
-                raise HTTPException(status_code=401, detail=message)
         except PyJWTError:
-            user = None
+            user_id = None
 
         return user_id
 

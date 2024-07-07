@@ -1,2 +1,3 @@
 #!/usr/bin/bash
+# start the fastapi server
 uvicorn main:app --port 8000 --reload

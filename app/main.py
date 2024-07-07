@@ -5,16 +5,25 @@ from db import SessionLocal, engine
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from middleware import CustomAuthenticationMiddleWare
 from models import Base, Organization, User
 from schemas import (
+    OrgBaseSchema,
+    OrgResponseSchema,
+    OrgSchema,
     UserData,
+    UserDataSchema,
+    UserDetailSchema,
     UserLoginSchema,
+    UserOrganizationSchema,
+    UserOrganizationSchemaResponse,
+    UserOrgResponseSchema,
+    UserOrgSchema,
     UserPostSchema,
     UserResponseSchema,
-    UserDataSchema,
-    UserDetailSchema
 )
 from sqlalchemy.orm import Session
+from starlette.middleware.authentication import AuthenticationMiddleware
 from utils import (
     hash_password,
     post_login_response,
@@ -28,6 +37,13 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 
+# custom middle ware added
+app.add_middleware(
+    AuthenticationMiddleware, backend=CustomAuthenticationMiddleWare()
+)
+
+
+# get database session
 def get_db():
     db = SessionLocal()
     try:
@@ -58,7 +74,7 @@ def create_user(user: UserPostSchema, db: Session = Depends(get_db)):
     if exist_user:
         content = {
             "status": "Bad Request",
-            "message": "User already exist",
+            "message": "Registration unsuccessful",
             "status_code": 400,
         }
         return JSONResponse(
@@ -89,7 +105,7 @@ def login_user(user: UserLoginSchema, db: Session = Depends(get_db)):
             "message": "Authentication failed",
             "statusCode": 401,
         }
-        return HTTPException(status_code=401, detail=detail)
+        return JSONResponse(status_code=401, content=detail)
     user_dict = user_db.to_dict()
     message = "Login successful"
     dct, access_token = get_user_and_access_token(user_dict, message)
@@ -124,6 +140,133 @@ def get_user(request: Request, id: str, db: Session = Depends(get_db)):
         return response
 
     return JSONResponse(status_code=404, content={"message": "User not found"})
+
+
+@app.get("/api/organisations", response_model=UserOrgResponseSchema)
+def get_all_user_organisaton(request: Request, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.userId == request.user.username).first()
+    if not user:
+        return JSONResponse(
+            status_code=404, content={"message": "user not found"}
+        )
+
+    user_org = UserOrgSchema(
+        organisations=[
+            OrgSchema(
+                orgId=str(org.orgId),
+                name=org.name,
+                description=org.description,
+            )
+            for org in user.organizations
+        ]
+    )
+    response = UserOrgResponseSchema(
+        status="success", message="organization fetched", data=user_org
+    )
+    return response
+
+
+@app.get("/api/organisations/{orgId}", response_model=OrgResponseSchema)
+@login_required
+def get_single_organisation(
+    request: Request, orgId: str, db: Session = Depends(get_db)
+):
+    """
+    get a single organization user is associated with
+    """
+    user_org = (
+        db.query(Organization).filter(Organization.orgId == orgId).first()
+    )
+    if not user_org:
+        content = {
+            "status": "Bad request",
+            "message": "Organisation Not Found",
+            "statusCode": 401,
+        }
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND, content=content
+        )
+    user_dict = user_org.to_dict()
+    user_org = OrgSchema(**user_dict)
+    response = OrgResponseSchema(
+        status="success", message="Organization found", data=user_dict
+    )
+    return response
+
+
+@app.post(
+    "/api/organisations", status_code=201, response_model=OrgResponseSchema
+)
+@login_required
+def create_organization(
+    request: Request, org: OrgBaseSchema, db: Session = Depends(get_db)
+):
+    """
+    create user organization
+    """
+    existing_org = (
+        db.query(Organization).filter(Organization.name == org.name).first()
+    )
+    if existing_org:
+        detail = {
+            "status": "Unsuccessful request",
+            "message": "Client error",
+            "statusCode": 400,
+        }
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, content=detail
+        )
+    user = db.query(User).filter(User.userId == request.user.username).first()
+    add_org = Organization(name=org.name, description=org.description)
+    add_org.users.append(user)
+    db.add(add_org)
+    db.commit()
+    db.refresh(add_org)
+
+    org_dict = add_org.to_dict()
+    added_org = OrgSchema(**org_dict)
+    response = OrgResponseSchema(
+        status="Success",
+        message="Organisation created successfully",
+        data=added_org,
+    )
+    return response
+
+
+@app.post(
+    "/api/organisations/{orgId}/users",
+    response_model=UserOrganizationSchemaResponse,
+)
+def add_user_to_organisation(
+    orgId: str, user: UserOrganizationSchema, db: Session = Depends(get_db)
+):
+    org = db.query(Organization).filter(Organization.orgId == orgId).first()
+    if not org:
+        content = {
+            "status": "Bad Request",
+            "message": "organization not found",
+            "statusCode": 404,
+        }
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND, content=content
+        )
+    user_exist = db.query(User).filter(User.userId == user.userId).first()
+    if not user_exist:
+        content = {
+            "status": "Bad Request",
+            "message": "user not found",
+            "statusCode": 404,
+        }
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND, content=content
+        )
+
+    org.users.append(user_exist)
+    db.commit()
+    response = UserOrganizationSchemaResponse(
+        status="success", message="User added to organisation successfully"
+    )
+    return response
 
 
 @app.exception_handler(RequestValidationError)

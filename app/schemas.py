@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
 # from email_validator import validate_email, EmailNotValidError
-from typing import Mapping, Dict, Optional
+from typing import List, Mapping, Dict, Optional
 from validators import validate_field
 
 
@@ -78,3 +78,41 @@ class UserDetailSchema(BaseModel):
     status: str
     message: str
     data: UserDataSchema
+
+ # organization schema
+class OrgBaseSchema(BaseModel):
+    name: str
+    description: Optional[str] = ''
+
+    class Config:
+        from_attributes = True
+
+
+class OrgSchema(BaseModel):
+    orgId: str
+    name: str
+    description: Optional[str] = ''
+
+
+class OrgResponseSchema(BaseModel):
+    status: str
+    message: str
+    data: OrgSchema
+
+class UserOrgSchema(BaseModel):
+    organisations: List[OrgSchema] = []
+
+
+class UserOrgResponseSchema(BaseModel):
+    status: str
+    message: str
+    data: UserOrgSchema
+
+
+class UserOrganizationSchema(BaseModel):
+    userId: str
+
+
+class UserOrganizationSchemaResponse(BaseModel):
+    status: str
+    message: str
