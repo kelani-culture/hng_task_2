@@ -138,3 +138,10 @@ class TestUserLogin(TestUserBase):
         token_id = self.jwt.get_current_user(self.access_token)
         self.assertFalse(token_id, self.userId)
 
+
+class TestOrganization(TestUserBase):
+    def test_organization_associate_with_user(self):
+        """
+        test only a user associated with an organization is returned
+        """
+        ...
