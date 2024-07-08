@@ -18,7 +18,7 @@ from httpx import Client
 DEBUG = os.getenv('DEBUG').lower() == "true"
 
 #TODO change host endpoint on deployment
-BASE_URL = "http://localhost:8000"  if DEBUG else '' 
+BASE_URL = "http://localhost:8000"  if DEBUG else 'https://conscious-hare-hng-931619d8.koyeb.app/' 
 
 class TestUserAuthentication(unittest.TestCase):
     def setUp(self):
