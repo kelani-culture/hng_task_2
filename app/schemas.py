@@ -1,8 +1,15 @@
-from pydantic import BaseModel, EmailStr, field_validator, model_validator, ConfigDict
 # from email_validator import validate_email, EmailNotValidError
-from typing import List, Mapping, Dict, Optional
-from .validators import validate_field
+from typing import Dict, List, Mapping, Optional
 
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    field_validator,
+    model_validator,
+)
+
+from .validators import validate_field
 
 
 class UserBaseSchema(BaseModel):
@@ -10,6 +17,7 @@ class UserBaseSchema(BaseModel):
     last_name: str
     email: EmailStr
     phone: str
+
 
 class UserPostSchema(UserBaseSchema):
     password: str
@@ -22,7 +30,7 @@ class UserPostSchema(UserBaseSchema):
         phone = validate_field(phone, msg, pattern)
         return phone
 
-    @field_validator('first_name')
+    @field_validator("first_name")
     @classmethod
     def validate_first_name(cls, first_name):
         pattern = r"^[^\d+$]+"
@@ -30,7 +38,7 @@ class UserPostSchema(UserBaseSchema):
         first_name = validate_field(first_name, msg, pattern)
         return first_name
 
-    @field_validator('last_name')
+    @field_validator("last_name")
     @classmethod
     def validate_last_name(cls, last_name):
         pattern = r"^[^\d+$]+"
@@ -49,6 +57,8 @@ class UserPostSchema(UserBaseSchema):
     #     return values
 
     model_config = ConfigDict(from_attributes=True)
+
+
 class UserDataSchema(BaseModel):
     userId: str
     first_name: str
@@ -56,10 +66,12 @@ class UserDataSchema(BaseModel):
     email: EmailStr
     phone: str
 
+
 class UserData(BaseModel):
     access_token: str
     user: UserDataSchema
-    
+
+
 class UserResponseSchema(BaseModel):
     status: str
     message: str
@@ -78,10 +90,11 @@ class UserDetailSchema(BaseModel):
     message: str
     data: UserDataSchema
 
- # organization schema
+
+# organization schema
 class OrgBaseSchema(BaseModel):
     name: str
-    description: Optional[str] = ''
+    description: Optional[str] = ""
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -89,13 +102,14 @@ class OrgBaseSchema(BaseModel):
 class OrgSchema(BaseModel):
     orgId: str
     name: str
-    description: Optional[str] = ''
+    description: Optional[str] = ""
 
 
 class OrgResponseSchema(BaseModel):
     status: str
     message: str
     data: OrgSchema
+
 
 class UserOrgSchema(BaseModel):
     organisations: List[OrgSchema] = []

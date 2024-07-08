@@ -6,15 +6,15 @@ from starlette.authentication import (
     UnauthenticatedUser,
 )
 
-from .auth import JwtGenerator
 
+from .auth import JwtGenerator
 
 class CustomAuthenticationMiddleWare:
     async def authenticate(self, request: Request):
-        token = request.cookies.get('token')
+        token = request.cookies.get("token")
         user_id = JwtGenerator.get_current_user(token)
         if not user_id:
             roles = ["annon"]
             return AuthCredentials(roles), UnauthenticatedUser()
-        roles = ['authenticated']
+        roles = ["authenticated"]
         return AuthCredentials(roles), SimpleUser(user_id)

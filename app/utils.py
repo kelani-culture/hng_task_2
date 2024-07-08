@@ -1,7 +1,7 @@
 from passlib.context import CryptContext
 
-
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+
 
 def hash_password(password: str) -> str:
     """
@@ -15,6 +15,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     verified hash password
     """
     return pwd_context.verify(plain_password, hashed_password)
+
 
 post_response = {
     201: {
@@ -32,7 +33,7 @@ post_response = {
                         "email": "john.doe@example.com",
                         "password": "securepassword",
                         "phone": "000 000 000",
-                    }
+                    },
                 }
             }
         },
@@ -52,7 +53,6 @@ post_response = {
 }
 
 
-
 post_login_response = {
     200: {
         "description": "Successful  login response",
@@ -69,7 +69,7 @@ post_login_response = {
                         "email": "john.doe@example.com",
                         "password": "securepassword",
                         "phone": "000 000 000",
-                    }
+                    },
                 }
             }
         },

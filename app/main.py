@@ -24,13 +24,9 @@ from .schemas import (
 )
 from sqlalchemy.orm import Session
 from starlette.middleware.authentication import AuthenticationMiddleware
-from .utils import (
-    hash_password,
-    post_login_response,
-    post_response,
-    verify_password,
-)
 
+
+from .utils import hash_password, post_login_response, post_response, verify_password
 Base.metadata.create_all(bind=engine)
 
 

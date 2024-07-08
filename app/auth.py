@@ -9,8 +9,8 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 from jwt.exceptions import PyJWTError
 import os
-from .config import Settings
 
+from .config import Settings
 load_dotenv()
 
 settings = Settings()

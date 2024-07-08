@@ -4,8 +4,8 @@ from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from .db import Base
 
+from .db import Base
 association_table = Table(
     "association",
     Base.metadata,
