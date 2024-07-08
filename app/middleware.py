@@ -1,11 +1,14 @@
-from auth import JwtGenerator
 from fastapi import Request
 from starlette.authentication import (
+    AuthCredentials,
     AuthenticationBackend,
     SimpleUser,
     UnauthenticatedUser,
-    AuthCredentials
 )
+
+from .auth import JwtGenerator
+
+
 class CustomAuthenticationMiddleWare:
     async def authenticate(self, request: Request):
         token = request.cookies.get('token')

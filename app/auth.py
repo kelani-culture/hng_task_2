@@ -1,17 +1,22 @@
+import os
 from datetime import datetime, timedelta
+from functools import wraps
 from typing import Optional
 
-from functools import wraps
-from fastapi import Depends, HTTPException, Request
 import jwt
-from config import Settings
-from jwt.exceptions import  PyJWTError
-from typing import Optional
+from dotenv import load_dotenv
+from fastapi import Request
+from fastapi.responses import JSONResponse
+from jwt.exceptions import PyJWTError
+import os
+from .config import Settings
+
+load_dotenv()
 
 settings = Settings()
 
-SECRET_KEY = settings.secret_key
-ALGORITHM = settings.algorithm
+SECRET_KEY = os.getenv('SECRET_KEY')
+ALGORITHM = 'HS256'
 
 
 
@@ -57,6 +62,6 @@ def login_required(func):
                 "message": "Authentication failed",
                 "statusCode": 401
             }
-            return HTTPException(status_code=401, detail=detail)
+            return JSONResponse(status_code=401, content=detail)
         return func(request, *args, **kwargs)
     return wrappers

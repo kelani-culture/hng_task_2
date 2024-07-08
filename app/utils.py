@@ -23,7 +23,7 @@ post_response = {
             "application/json": {
                 "example": {
                     "status": "success",
-                    "message": "Login successful",
+                    "message": "Registration successful",
                     "data": {
                         "accessToken": "eyJh...",
                         "userId": "c3a77c95-0ae3-4837-90cd-e43284729c7a",
@@ -43,7 +43,7 @@ post_response = {
             "application/json": {
                 "example": {
                     "status": "Bad Request",
-                    "message": "User already exist",
+                    "message": "Registration unsuccessful",
                     "status_code": 400,
                 }
             }

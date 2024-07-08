@@ -1,17 +1,18 @@
 from uuid import uuid4
 
-from db import Base
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
+from .db import Base
 
 association_table = Table(
     "association",
     Base.metadata,
-    Column('user_id', ForeignKey('user.userId')),
-    Column('org_id', ForeignKey('organization.orgId'))
+    Column("user_id", ForeignKey("user.userId")),
+    Column("org_id", ForeignKey("organization.orgId")),
 )
+
 
 class User(Base):
     __tablename__ = "user"
@@ -28,15 +29,17 @@ class User(Base):
     password = Column(String(100), nullable=False)
     phone = Column(String(50))
 
-    organizations = relationship('Organization', secondary=association_table, back_populates='users')
+    organizations = relationship(
+        "Organization", secondary=association_table, back_populates="users"
+    )
 
     def to_dict(self):
         obj_dict = self.__dict__
-        if '_sa_instance_state' in obj_dict:
-            del obj_dict['_sa_instance_state']
-        del obj_dict['password']
-        obj_dict['userId']= str(self.userId)
-        
+        if "_sa_instance_state" in obj_dict:
+            del obj_dict["_sa_instance_state"]
+        del obj_dict["password"]
+        obj_dict["userId"] = str(self.userId)
+
         return {key: value for key, value in obj_dict.items()}
 
     def __str__(self):
@@ -54,14 +57,17 @@ class Organization(Base):
     )
     name = Column(String(50), nullable=False)
     description = Column(String(500), nullable=True)
-    users = relationship("User", secondary=association_table, back_populates='organizations')
+    users = relationship(
+        "User", secondary=association_table, back_populates="organizations"
+    )
 
     def to_dict(self):
         obj_dict = self.__dict__
-        if '_sa_instance_state' in obj_dict:
-            del obj_dict['_sa_instance_state']
+        if "_sa_instance_state" in obj_dict:
+            del obj_dict["_sa_instance_state"]
 
-        obj_dict['orgId'] = str(self.orgId)
+        obj_dict["orgId"] = str(self.orgId)
         return obj_dict
+
     def __str__(self):
         return self.name

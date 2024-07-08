@@ -1,7 +1,7 @@
-from pydantic import BaseModel, EmailStr, field_validator, model_validator
+from pydantic import BaseModel, EmailStr, field_validator, model_validator, ConfigDict
 # from email_validator import validate_email, EmailNotValidError
 from typing import List, Mapping, Dict, Optional
-from validators import validate_field
+from .validators import validate_field
 
 
 
@@ -25,7 +25,7 @@ class UserPostSchema(UserBaseSchema):
     @field_validator('first_name')
     @classmethod
     def validate_first_name(cls, first_name):
-        pattern = "^[^\d+$]+"
+        pattern = r"^[^\d+$]+"
         msg = "first name can only contain alphabet and no numbers"
         first_name = validate_field(first_name, msg, pattern)
         return first_name
@@ -33,7 +33,7 @@ class UserPostSchema(UserBaseSchema):
     @field_validator('last_name')
     @classmethod
     def validate_last_name(cls, last_name):
-        pattern = "^[^\d+$]+"
+        pattern = r"^[^\d+$]+"
         msg = "last name can only contain alphabet and no numbers"
         last_name = validate_field(last_name, msg, pattern)
         return last_name
@@ -48,9 +48,7 @@ class UserPostSchema(UserBaseSchema):
 
     #     return values
 
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)
 class UserDataSchema(BaseModel):
     userId: str
     first_name: str
@@ -71,8 +69,9 @@ class UserResponseSchema(BaseModel):
 class UserLoginSchema(BaseModel):
     email: EmailStr
     password: str
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
+
 
 class UserDetailSchema(BaseModel):
     status: str
@@ -84,8 +83,7 @@ class OrgBaseSchema(BaseModel):
     name: str
     description: Optional[str] = ''
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class OrgSchema(BaseModel):

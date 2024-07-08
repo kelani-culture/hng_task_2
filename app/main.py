@@ -1,13 +1,13 @@
 from typing import Annotated, List
 
-from auth import JwtGenerator, login_required
-from db import SessionLocal, engine
+from .auth import JwtGenerator, login_required
+from .db import SessionLocal, engine
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from middleware import CustomAuthenticationMiddleWare
-from models import Base, Organization, User
-from schemas import (
+from .middleware import CustomAuthenticationMiddleWare
+from .models import Base, Organization, User
+from .schemas import (
     OrgBaseSchema,
     OrgResponseSchema,
     OrgSchema,
@@ -24,7 +24,7 @@ from schemas import (
 )
 from sqlalchemy.orm import Session
 from starlette.middleware.authentication import AuthenticationMiddleware
-from utils import (
+from .utils import (
     hash_password,
     post_login_response,
     post_response,
@@ -75,7 +75,7 @@ def create_user(user: UserPostSchema, db: Session = Depends(get_db)):
         content = {
             "status": "Bad Request",
             "message": "Registration unsuccessful",
-            "status_code": 400,
+            "statusCode": 400,
         }
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST, content=content
@@ -86,6 +86,7 @@ def create_user(user: UserPostSchema, db: Session = Depends(get_db)):
     user_dict = user.to_dict()
     dct, _ = get_user_and_access_token(user_dict, "Registration successful")
     response = JSONResponse(status_code=201, content=dct)
+    db.close()
     return response
 
 
@@ -109,8 +110,9 @@ def login_user(user: UserLoginSchema, db: Session = Depends(get_db)):
     user_dict = user_db.to_dict()
     message = "Login successful"
     dct, access_token = get_user_and_access_token(user_dict, message)
-    response = JSONResponse(status_code=201, content=dct)
+    response = JSONResponse(status_code=200, content=dct)
     response.set_cookie(key="token", value=access_token, httponly=True)
+    db.close()
     return response
 
 
@@ -138,11 +140,12 @@ def get_user(request: Request, id: str, db: Session = Depends(get_db)):
             status="success", message="User found", data=user_info
         ).model_dump()
         return response
-
+    db.close()
     return JSONResponse(status_code=404, content={"message": "User not found"})
 
 
 @app.get("/api/organisations", response_model=UserOrgResponseSchema)
+@login_required
 def get_all_user_organisaton(request: Request, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.userId == request.user.username).first()
     if not user:
@@ -163,6 +166,7 @@ def get_all_user_organisaton(request: Request, db: Session = Depends(get_db)):
     response = UserOrgResponseSchema(
         status="success", message="organization fetched", data=user_org
     )
+    db.close()
     return response
 
 
@@ -191,6 +195,7 @@ def get_single_organisation(
     response = OrgResponseSchema(
         status="success", message="Organization found", data=user_dict
     )
+    db.close()
     return response
 
 
@@ -230,6 +235,7 @@ def create_organization(
         message="Organisation created successfully",
         data=added_org,
     )
+    db.close()
     return response
 
 
@@ -266,6 +272,7 @@ def add_user_to_organisation(
     response = UserOrganizationSchemaResponse(
         status="success", message="User added to organisation successfully"
     )
+    db.close()
     return response
 
 
@@ -277,7 +284,7 @@ def custom_request_validation_error(
     handles the user validation error response
     """
     error = [
-        {"fields": err["loc"][1], "message": err["msg"]}
+        {"fields": err["loc"][0], "message": err["msg"]}
         for err in exc.errors()
     ]
     return JSONResponse(
