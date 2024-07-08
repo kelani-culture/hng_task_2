@@ -9,7 +9,7 @@ from pydantic import (
     model_validator,
 )
 
-from validators import validate_field
+from app.validators import validate_field
 
 
 class UserBaseSchema(BaseModel):
