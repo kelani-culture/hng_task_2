@@ -7,7 +7,7 @@ from starlette.authentication import (
 )
 
 
-from .auth import JwtGenerator
+from auth import JwtGenerator
 
 class CustomAuthenticationMiddleWare:
     async def authenticate(self, request: Request):

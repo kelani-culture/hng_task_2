@@ -1,13 +1,13 @@
 from typing import Annotated, List
 
-from .auth import JwtGenerator, login_required
-from .db import SessionLocal, engine
+from auth import JwtGenerator, login_required
+from db import SessionLocal, engine
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from .middleware import CustomAuthenticationMiddleWare
-from .models import Base, Organization, User
-from .schemas import (
+from middleware import CustomAuthenticationMiddleWare
+from models import Base, Organization, User
+from schemas import (
     OrgBaseSchema,
     OrgResponseSchema,
     OrgSchema,
@@ -26,7 +26,7 @@ from sqlalchemy.orm import Session
 from starlette.middleware.authentication import AuthenticationMiddleware
 
 
-from .utils import hash_password, post_login_response, post_response, verify_password
+from utils import hash_password, post_login_response, post_response, verify_password
 Base.metadata.create_all(bind=engine)
 
 
