@@ -22,13 +22,6 @@ class UserBaseSchema(BaseModel):
 class UserPostSchema(UserBaseSchema):
     password: str
 
-    @field_validator("phone")
-    @classmethod
-    def validate_phone_number(cls, phone):
-        pattern = r"\d+"
-        msg = f"Invalid phone number {phone} provided, phone number can only be digit"
-        phone = validate_field(phone, msg, pattern)
-        return phone
 
     @field_validator("first_name")
     @classmethod
