@@ -21,34 +21,6 @@ class UserBaseSchema(BaseModel):
 
 class UserPostSchema(UserBaseSchema):
     password: str
-
-
-    @field_validator("first_name")
-    @classmethod
-    def validate_first_name(cls, first_name):
-        pattern = r"^[^\d+$]+"
-        msg = "first name can only contain alphabet and no numbers"
-        first_name = validate_field(first_name, msg, pattern)
-        return first_name
-
-    @field_validator("last_name")
-    @classmethod
-    def validate_last_name(cls, last_name):
-        pattern = r"^[^\d+$]+"
-        msg = "last name can only contain alphabet and no numbers"
-        last_name = validate_field(last_name, msg, pattern)
-        return last_name
-
-    # @field_validator('email')
-    # @classmethod
-    # def email_validate(cls, values):
-    #     try:
-    #         email = validate_email(values)
-    #     except EmailNotValidError as e:
-    #         raise ValueError("Invalid email address provided")
-
-    #     return values
-
     model_config = ConfigDict(from_attributes=True)
 
 
